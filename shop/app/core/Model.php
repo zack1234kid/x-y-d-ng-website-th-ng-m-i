@@ -21,6 +21,18 @@ abstract class Model {
         $stmt = static::db()->prepare('DELETE FROM ' . static::$table . ' WHERE ' . static::$primaryKey . ' = :id');
         return $stmt->execute(['id' => $id]);
     }
+    public static function update($id, array $data): bool {
+        if (!$data) throw new InvalidArgumentException('Du lieu cap nhat dang trong.');
+        $sets = []; $params = [];
+        foreach ($data as $column => $value) {
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $column)) throw new InvalidArgumentException('Ten cot khong hop le.');
+            $sets[] = $column . ' = :' . $column;
+            $params[$column] = $value;
+        }
+        $params['__id'] = $id;
+        $sql = 'UPDATE ' . static::$table . ' SET ' . implode(', ', $sets) . ' WHERE ' . static::$primaryKey . ' = :__id';
+        return static::db()->prepare($sql)->execute($params);
+    }
     public static function insert(array $data): int {
         if (!$data) throw new InvalidArgumentException('Du lieu them moi dang trong.');
         $columns = array_keys($data);

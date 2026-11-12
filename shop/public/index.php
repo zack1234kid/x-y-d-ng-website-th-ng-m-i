@@ -1,9 +1,12 @@
 <?php
-// Diem vao duy nhat cua ung dung.
+// public/index.php
+
+// Front controller - diem vao DUY NHAT cua toan bo ung dung
+session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax']);
 session_start();
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../app/core/helpers.php';
-
+// Tu dong nap class theo ten file, khong phai require thu cong tung noi
 spl_autoload_register(function (string $class): void {
     $directories = [
         __DIR__ . '/../app/core/',
@@ -14,7 +17,10 @@ spl_autoload_register(function (string $class): void {
     ];
     foreach ($directories as $dir) {
         $file = $dir . $class . '.php';
-        if (is_file($file)) { require_once $file; return; }
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
     }
 });
 new App();
